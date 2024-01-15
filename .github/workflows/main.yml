@@ -1,11 +1,12 @@
 name: Ruby
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: # Prevent from running every change during dev
+  # push:
+  #   branches:
+  #     - main
 
-  pull_request:
+  # pull_request:
 
 jobs:
   build:
