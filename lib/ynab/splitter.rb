@@ -21,10 +21,10 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-puts "Splitting transactions for "
-
 ApiKey = options[:key]
 TransactionDate = DateTime.now.prev_day.strftime("%Y-%m-%d")
+
+puts "Splitting transactions for #{TransactionDate}"
 
 if options[:verbose]
   puts "Running with verbose command line param"
@@ -35,6 +35,20 @@ if options[:dry]
   puts "Running with --dry command line param. No new transactions will be created"
 end
 
+# TODO: Store these in config somewhere
+FirstBudget = {
+  id: 'firstbudgetid',
+  newTransactionFlagColor: 'purple',
+  parsedTransactionFlagColor: 'green',
+}
+
+SecondBudget = {
+  id: 'secondbudgetid',
+  newTransactionFlagColor: 'purple',
+  parsedTransactionFlagColor: 'green',
+}
+
+puts "First budget id: #{FirstBudget[:id]}"
 
 module Ynab
   module Splitter

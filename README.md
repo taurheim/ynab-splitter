@@ -19,6 +19,8 @@ rspec spec/ynab/name_of_test.rb
 
 ## Development
 
+`ruby ./lib/ynab/splitter.rb --verbose -k "$YNAB_API_KEY" --dry`
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/ynab-splitter.
