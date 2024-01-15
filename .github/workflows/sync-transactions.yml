@@ -22,4 +22,4 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - run: ruby ./lib/ynab/splitter.rb
+      - run: ruby ./lib/ynab/splitter.rb -v -k ${{ secrets.YNAB_API_KEY }}
