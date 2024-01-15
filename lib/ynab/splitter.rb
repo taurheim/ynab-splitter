@@ -2,6 +2,7 @@
 
 require_relative "splitter/version"
 require "optparse"
+require "date"
 
 options = {}
 OptionParser.new do |opts|
@@ -14,13 +15,24 @@ OptionParser.new do |opts|
   opts.on("-kKEY", "--key=KEY", "YNAB API Key") do |k|
     options[:key] = k
   end
+
+  opts.on("-d", "--dry", "Dry run / don't create any transactions") do |d|
+    options[:dry] = d
+  end
 end.parse!
 
-puts "Hello World!"
+puts "Splitting transactions for "
+
+ApiKey = options[:key]
+TransactionDate = DateTime.now.prev_day.strftime("%Y-%m-%d")
 
 if options[:verbose]
   puts "Running with verbose command line param"
-  puts "YNAB API Key: #{options[:key]}"
+  puts "Transaction Date: #{TransactionDate}"
+end
+
+if options[:dry]
+  puts "Running with --dry command line param. No new transactions will be created"
 end
 
 
