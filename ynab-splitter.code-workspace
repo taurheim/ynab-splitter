@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.codeActionsOnSave": {
+			"source.fixAll": "always",
+			"source.fixAll.eslint": "always"
+		},
+		"editor.formatOnSave": true,
+		"javascript.format.enable": true,
+		"files.eol": "\n"
+	}
+}

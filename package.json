@@ -1,0 +1,43 @@
+{
+  "name": "ynab-splitter",
+  "version": "1.0.0",
+  "description": "Split transactions across two budgets in YNAB",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "splitter": "tsx src/index.ts",
+    "splitter:dry": "tsx src/index.ts --dry-run",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .js,.ts --ignore-path .gitignore .",
+    "lint:fix": "eslint --ext .js,.ts --ignore-path .gitignore --fix ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taurheim/ynab-splitter.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/taurheim/ynab-splitter/issues"
+  },
+  "homepage": "https://github.com/taurheim/ynab-splitter#readme",
+  "devDependencies": {
+    "@types/node": "^20.11.25",
+    "@types/yargs": "^17.0.32",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "tsx": "^4.7.1",
+    "yargs": "^17.7.2",
+    "ynab": "^2.2.0"
+  }
+}

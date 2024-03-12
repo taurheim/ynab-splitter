@@ -13,7 +13,9 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v4
         with:
-          bundler-cache: true
-      - run: ruby ./lib/ynab/splitter.rb -v --key "${{ secrets.YNAB_API_KEY }}" ${{ inputs.dry && '--dry'}}
+          node-version: '20'
+          cache: 'npm'
+      - run: npm install
+      - run: npm run splitter:dry -- -k "${{ secrets.YNAB_API_KEY }}" ${{ inputs.dry && '--dry-run'}}

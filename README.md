@@ -5,25 +5,25 @@
 setup
 
 ```bash
-cd ynab-splitter
-bundle install
+npm ci
 ```
 
 run tests
 
 ```bash
-rspec spec/ynab/name_of_test.rb 
+npm run test
 ```
 
 ## Usage
+To run without actually changing any budgets:
+`npm run splitter:dry`
 
-## Development
-
-`ruby ./lib/ynab/splitter.rb --verbose -k "$YNAB_API_KEY" --dry`
+To run and split transactions:
+`npm run splitter`
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/ynab-splitter.
+Bug reports and pull requests are welcome on GitHub at https://github.com/taurheim/ynab-splitter.
 
 ## License
 
