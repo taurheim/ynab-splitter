@@ -1,5 +1,17 @@
 # Ynab::Splitter
 
+## What does it do?
+Share expenses across two budgets by splitting any transactions according to option 2 in https://support.ynab.com/en_us/splitwise-and-ynab-a-guide-H1GwOyuCq
+
+Limitations (pull requests welcome!):
+- Budgets must be accessible by one account
+- This will not handle doing the math of who owes how much
+- Cannot handle any transactions that have already been split
+- Always splits everything 50/50
+
+## Setup
+TODO
+
 ## Installation
 
 setup
