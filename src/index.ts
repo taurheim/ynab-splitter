@@ -36,7 +36,7 @@ if (dryRun) {
 const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetConfig) => {
   const transactionsResponse = await ynab.transactions.getTransactions(fromBudget.id);
   const flaggedTransactions = transactionsResponse.data.transactions.filter(
-    (transaction) => transaction.flag_color === fromBudget.flagBeforeSplit && transaction.subtransactions.length === 0, // Don't accidentally split a transaction that has already been split
+    (transaction) => transaction.flag_color === fromBudget.flagBeforeSplit,
   );
 
   if (verbose) {
@@ -44,55 +44,90 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
   }
 
   for (const transaction of flaggedTransactions) {
-    const updatedTransaction: PutTransactionWrapper = {
-      transaction: {
-        flag_color: fromBudget.flagAfterSplit,
-        subtransactions: [
-          {
-            category_id: transaction.category_id,
-            amount: transaction.amount / 2,
-          },
-          {
-            category_id: fromBudget.splitCategoryId,
-            amount: transaction.amount / 2,
-          },
-        ],
-      },
-    };
+    if (transaction.subtransactions.length > 0) {
+      if (verbose) {
+        console.log(`Found already split transaction to duplicate in budget ${fromBudget.id} and move to budget ${toBudget.id}`);
+      }
 
-    // Duplicate that transaction in the other budget that is for half the amount
-    const duplicatedTransaction: PostTransactionsWrapper = {
-      transaction: {
-        account_id: toBudget.sharedAccountId,
-        date: transaction.date,
-        amount: transaction.amount / 2,
-        memo: transaction.memo,
-        cleared: 'cleared',
-        payee_name: transaction.payee_name,
-        flag_color: toBudget.importedFlag,
-      },
-    };
-
-    if (verbose) {
-      console.log(
-        `Splitting ${formatPrice(transaction.amount)} transaction to ${transaction.payee_name} into two ${formatPrice(transaction.amount / 2)} transactions`,
-      );
+      duplicateSplitTransaction(transaction, toBudget);
     }
+    else {
+      const updatedTransaction: PutTransactionWrapper = {
+        transaction: {
+          flag_color: fromBudget.flagAfterSplit,
+          subtransactions: [
+            {
+              category_id: transaction.category_id,
+              amount: transaction.amount / 2,
+            },
+            {
+              category_id: fromBudget.splitCategoryId,
+              amount: transaction.amount / 2,
+            },
+          ],
+        },
+      };  
+    
+      // Duplicate that transaction in the other budget that is for half the amount
+      const duplicatedTransaction: PostTransactionsWrapper = {
+        transaction: {
+          account_id: toBudget.sharedAccountId,
+          date: transaction.date,
+          amount: transaction.amount / 2,
+          memo: transaction.memo,
+          cleared: 'cleared',
+          payee_name: transaction.payee_name,
+          flag_color: toBudget.importedFlag,
+        },
+      };
 
-    if (dryRun) {
-      console.log('Dry run: would update transaction', updatedTransaction);
-      console.log('Dry run: would create transaction', duplicatedTransaction);
-    } else {
       if (verbose) {
-        console.log(`Updating transaction in budget ${toBudget.id}`, JSON.stringify(updatedTransaction));
+        console.log(
+          `Splitting ${formatPrice(transaction.amount)} transaction to ${transaction.payee_name} into two ${formatPrice(transaction.amount / 2)} transactions`,
+        );
       }
-      await ynab.transactions.updateTransaction(fromBudget.id, transaction.id, updatedTransaction);
-      if (verbose) {
-        console.log(`Creating transaction in budget ${toBudget.id}`, JSON.stringify(duplicatedTransaction));
+
+      if (dryRun) {
+        console.log('Dry run: would update transaction', updatedTransaction);
+        console.log('Dry run: would create transaction', duplicatedTransaction);
+      } else {
+        if (verbose) {
+          console.log(`Updating transaction in budget ${toBudget.id}`, JSON.stringify(updatedTransaction));
+        }
+        await ynab.transactions.updateTransaction(fromBudget.id, transaction.id, updatedTransaction);
+        if (verbose) {
+          console.log(`Creating transaction in budget ${toBudget.id}`, JSON.stringify(duplicatedTransaction));
+        }
+        await ynab.transactions.createTransaction(toBudget.id, duplicatedTransaction);
       }
-      await ynab.transactions.createTransaction(toBudget.id, duplicatedTransaction);
     }
   }
+};
+
+const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfig) => {
+  const splitAmount1 = transaction.subtransactions[0].amount;
+  const splitAmount2 = transaction.subtransactions[1].amount;
+
+  const duplicatedTransaction: PostTransactionsWrapper = {
+    transaction: {
+      account_id: toBudget.sharedAccountId,
+      date: transaction.date,
+      amount: splitAmount2,
+      memo: transaction.memo,
+      cleared: 'cleared',
+      payee_name: transaction.payee_name,
+      flag_color: toBudget.importedFlag,
+    },
+  };
+
+  if (verbose) {
+    console.log(
+      `Duplicating split 1 of transaction for the amount ${splitAmount2} to budget ${toBudget.id}`,
+    );
+  }
+
+  // call the API to create the duplicate transaction in the toBudget
+  await ynab.transactions.createTransaction(toBudget.id, duplicatedTransaction);
 };
 
 const splitTransactions = async (budget1: BudgetConfig, budget2: BudgetConfig) => {
