@@ -49,7 +49,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
         console.log(`Found already split transaction to duplicate in budget ${fromBudget.id} and move to budget ${toBudget.id}`);
       }
 
-      duplicateSplitTransaction(transaction, toBudget);
+      duplicateSplitTransaction(transaction, toBudget, fromBudget);
     }
     else {
       const updatedTransaction: PutTransactionWrapper = {
@@ -104,7 +104,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
   }
 };
 
-const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfig) => {
+const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfig, fromBudget: BudgetConfig) => {
   const splitAmount1 = transaction.subtransactions[0].amount;
   const splitAmount2 = transaction.subtransactions[1].amount;
 
@@ -120,14 +120,36 @@ const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfi
     },
   };
 
-  if (verbose) {
+  const updatedTransaction: PutTransactionWrapper = {
+    transaction: {
+      flag_color: fromBudget.flagAfterSplit
+    },
+  };  
+
+  if (dryRun) {
     console.log(
-      `Duplicating split 1 of transaction for the amount ${splitAmount2} to budget ${toBudget.id}`,
+      `Dry run: Would be creating split 1 of transaction for the amount ${splitAmount2} to budget ${toBudget.id}`,
+      `Dry run: Would update transaction in budget ${fromBudget.id} to change the flag color`,
     );
   }
 
-  // call the API to create the duplicate transaction in the toBudget
-  await ynab.transactions.createTransaction(toBudget.id, duplicatedTransaction);
+  if (!dryRun) {
+    if (verbose) {
+      console.log(
+        `Duplicating split 1 of transaction for the amount ${splitAmount2} to budget ${toBudget.id}`,
+      );
+    }
+
+    await ynab.transactions.createTransaction(toBudget.id, duplicatedTransaction);
+
+    if (verbose) {
+      console.log(
+        `Updating transaction in budget ${fromBudget.id}`,
+      );
+    }
+
+    await ynab.transactions.updateTransaction(fromBudget.id, transaction.id, updatedTransaction);
+  }
 };
 
 const splitTransactions = async (budget1: BudgetConfig, budget2: BudgetConfig) => {
