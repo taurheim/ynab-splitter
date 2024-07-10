@@ -7,7 +7,6 @@ Limitations (pull requests welcome!):
 - Budgets must be accessible by one account
 - This will not handle doing the math of who owes how much
 - Cannot handle any transactions that have already been split
-- Always splits everything 50/50
 
 ## Setup
 TODO
