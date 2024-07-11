@@ -135,7 +135,7 @@ const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfi
   if (!dryRun) {
     if (verbose) {
       console.log(
-        `Duplicating split 1 of transaction for the amount ${splitAmount2} to budget ${toBudget.id}`,
+        `Duplicating split 1 of transaction for the amount ${splitAmount} to budget ${toBudget.id}`,
       );
     }
 
