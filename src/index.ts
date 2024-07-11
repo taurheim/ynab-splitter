@@ -105,14 +105,13 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
 };
 
 const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfig, fromBudget: BudgetConfig) => {
-  const splitAmount1 = transaction.subtransactions[0].amount;
-  const splitAmount2 = transaction.subtransactions[1].amount;
+  const splitAmount = transaction.subtransactions.filter((subtransaction: any) => subtransaction.category_id === fromBudget.splitCategoryId)[0].amount;
 
   const duplicatedTransaction: PostTransactionsWrapper = {
     transaction: {
       account_id: toBudget.sharedAccountId,
       date: transaction.date,
-      amount: splitAmount2,
+      amount: splitAmount,
       memo: transaction.memo,
       cleared: 'cleared',
       payee_name: transaction.payee_name,
@@ -128,7 +127,7 @@ const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfi
 
   if (dryRun) {
     console.log(
-      `Dry run: Would be creating split 1 of transaction for the amount ${splitAmount2} to budget ${toBudget.id}`,
+      `Dry run: Would be creating split 1 of transaction for the amount ${splitAmount} to budget ${toBudget.id}`,
       `Dry run: Would update transaction in budget ${fromBudget.id} to change the flag color`,
     );
   }
