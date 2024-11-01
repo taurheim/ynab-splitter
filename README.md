@@ -1,4 +1,4 @@
-# Ynab::Splitter
+# Ynab::Splitter 
 
 ## What does it do?
 Share expenses across two budgets by splitting any transactions according to option 2 in https://support.ynab.com/en_us/splitwise-and-ynab-a-guide-H1GwOyuCq
