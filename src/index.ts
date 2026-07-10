@@ -58,11 +58,11 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
           subtransactions: [
             {
               category_id: transaction.category_id,
-              amount: transaction.amount / 2,
+              amount: transaction.amount * 0.57,
             },
             {
               category_id: fromBudget.splitCategoryId,
-              amount: transaction.amount / 2,
+              amount: transaction.amount * 0.43,
             },
           ],
         },
@@ -73,7 +73,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
         transaction: {
           account_id: toBudget.sharedAccountId,
           date: transaction.date,
-          amount: transaction.amount / 2,
+          amount: transaction.amount * 0.57,
           memo: transaction.memo,
           cleared: 'cleared',
           payee_name: transaction.payee_name,
