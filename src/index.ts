@@ -61,11 +61,11 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
           subtransactions: [
             {
               category_id: transaction.category_id,
-              amount: transaction.amount * toBudgetSplitPercentage,
+              amount: Math.round(transaction.amount * toBudgetSplitPercentage),
             },
             {
               category_id: fromBudget.splitCategoryId,
-              amount: transaction.amount * fromBudgetSplitPercentage,
+              amount: Math.round(transaction.amount * fromBudgetSplitPercentage),
             },
           ],
         },
@@ -76,7 +76,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
         transaction: {
           account_id: toBudget.sharedAccountId,
           date: transaction.date,
-          amount: transaction.amount * toBudgetSplitPercentage,
+          amount: Math.round(transaction.amount * toBudgetSplitPercentage),
           memo: transaction.memo,
           cleared: 'cleared',
           payee_name: transaction.payee_name,
@@ -108,7 +108,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
 };
 
 const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfig, fromBudget: BudgetConfig) => {
-  const splitAmount = transaction.amount * toBudgetSplitPercentage;
+  const splitAmount = Math.round(transaction.amount * toBudgetSplitPercentage);
 
   const duplicatedTransaction: PostTransactionsWrapper = {
     transaction: {
