@@ -7,6 +7,9 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import { API, PostTransactionsWrapper, PutTransactionWrapper } from 'ynab';
 
+const toBudgetSplitPercentage = 0.57;
+const fromBudgetSplitPercentage = 0.43;
+
 const { apiKey, dryRun, verbose } = await yargs(hideBin(process.argv))
   .option('dry-run', {
     alias: 'd',
@@ -58,11 +61,11 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
           subtransactions: [
             {
               category_id: transaction.category_id,
-              amount: transaction.amount * 0.57,
+              amount: transaction.amount * toBudgetSplitPercentage,
             },
             {
               category_id: fromBudget.splitCategoryId,
-              amount: transaction.amount * 0.43,
+              amount: transaction.amount * fromBudgetSplitPercentage,
             },
           ],
         },
@@ -73,7 +76,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
         transaction: {
           account_id: toBudget.sharedAccountId,
           date: transaction.date,
-          amount: transaction.amount * 0.57,
+          amount: transaction.amount * toBudgetSplitPercentage,
           memo: transaction.memo,
           cleared: 'cleared',
           payee_name: transaction.payee_name,
@@ -83,7 +86,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
 
       if (verbose) {
         console.log(
-          `Splitting ${formatPrice(transaction.amount)} transaction to ${transaction.payee_name} into two ${formatPrice(transaction.amount / 2)} transactions`,
+          `Splitting ${formatPrice(transaction.amount)} transaction to ${transaction.payee_name} into ${formatPrice(transaction.amount * toBudgetSplitPercentage)} and ${formatPrice(transaction.amount * fromBudgetSplitPercentage)} transactions`,
         );
       }
 
@@ -105,7 +108,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
 };
 
 const duplicateSplitTransaction = async (transaction: any, toBudget: BudgetConfig, fromBudget: BudgetConfig) => {
-  const splitAmount = transaction.subtransactions.filter((subtransaction: any) => subtransaction.category_id === fromBudget.splitCategoryId)[0].amount;
+  const splitAmount = transaction.amount * toBudgetSplitPercentage;
 
   const duplicatedTransaction: PostTransactionsWrapper = {
     transaction: {
