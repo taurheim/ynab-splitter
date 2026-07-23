@@ -7,8 +7,8 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import { API, PostTransactionsWrapper, PutTransactionWrapper } from 'ynab';
 
-const toBudgetSplitPercentage = 0.57;
-const fromBudgetSplitPercentage = 0.43;
+const toBudgetSplitPercentage = 0.43;
+const fromBudgetSplitPercentage = 0.57;
 
 const { apiKey, dryRun, verbose } = await yargs(hideBin(process.argv))
   .option('dry-run', {
