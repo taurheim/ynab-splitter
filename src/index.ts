@@ -8,7 +8,6 @@ import { hideBin } from 'yargs/helpers';
 import { API, PostTransactionsWrapper, PutTransactionWrapper } from 'ynab';
 
 const toBudgetSplitPercentage = 0.43;
-const fromBudgetSplitPercentage = 0.57;
 
 const { apiKey, dryRun, verbose } = await yargs(hideBin(process.argv))
   .option('dry-run', {
@@ -55,17 +54,19 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
       duplicateSplitTransaction(transaction, toBudget, fromBudget);
     }
     else {
+      const toSplitAmount = Math.round(transaction.amount * toBudgetSplitPercentage);
+      const fromSplitAmount = transaction.amount - toSplitAmount;
       const updatedTransaction: PutTransactionWrapper = {
         transaction: {
           flag_color: fromBudget.flagAfterSplit,
           subtransactions: [
             {
               category_id: transaction.category_id,
-              amount: Math.round(transaction.amount * toBudgetSplitPercentage),
+              amount: toSplitAmount,
             },
             {
               category_id: fromBudget.splitCategoryId,
-              amount: Math.round(transaction.amount * fromBudgetSplitPercentage),
+              amount: fromSplitAmount,
             },
           ],
         },
@@ -76,7 +77,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
         transaction: {
           account_id: toBudget.sharedAccountId,
           date: transaction.date,
-          amount: Math.round(transaction.amount * toBudgetSplitPercentage),
+          amount: toSplitAmount,
           memo: transaction.memo,
           cleared: 'cleared',
           payee_name: transaction.payee_name,
@@ -86,7 +87,7 @@ const duplicateTransactions = async (fromBudget: BudgetConfig, toBudget: BudgetC
 
       if (verbose) {
         console.log(
-          `Splitting ${formatPrice(transaction.amount)} transaction to ${transaction.payee_name} into ${formatPrice(transaction.amount * toBudgetSplitPercentage)} and ${formatPrice(transaction.amount * fromBudgetSplitPercentage)} transactions`,
+          `Splitting ${formatPrice(transaction.amount)} transaction to ${transaction.payee_name} into ${formatPrice(toSplitAmount)} and ${formatPrice(fromSplitAmount)} transactions`,
         );
       }
 
